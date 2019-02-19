@@ -1,0 +1,12 @@
+    <table>
+        <tr>
+            <td><p>{{ user.followers.count() }} followers, {{ user.followed_by.count() }} following.</p></td>
+            {% if not user ==  current_user %}
+                {% if not current_user.is_following(user) %}
+                    <td><p><a href="{{ url_for('follow', username=user.username) }}">Follow</a></p></td>
+                {% else %}
+                    <td><p><a href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></p></td>
+                {% endif %}
+            {% endif %}
+        </tr>
+    </table>

@@ -1,0 +1,20 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }}</title>
+      {% else %}
+      <title>Demo App</title>
+      {% endif %}
+    </head>
+    <br>
+        <a href="{{ url_for('home') }}">Home</a></br>
+        {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Login</a></br>
+        {% else %}
+            <a href="{{ url_for('profile', username=current_user.username) }}">Profile</a></br>
+            <a href="{{ url_for('logout') }}">Logout</a></br>
+        {% endif %}
+        <a href="{{ url_for('all_posts') }}">All Posts</a>
+        {% block content %}{% endblock %}
+    </body>
+</html>
