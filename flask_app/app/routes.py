@@ -11,7 +11,7 @@ from flask_app.app.models import User, Post
 @app.route('/all_posts')
 @login_required
 def all_posts():
-    posts, next_page, prev_page = get_paginator_attributes()
+    posts, next_page, prev_page = get_paginator_attributes('all_posts', view_all=True)
 
     return render_template('home.html', title='All Posts', posts=posts.items, next_page=next_page, prev_page=prev_page)
 
@@ -28,7 +28,7 @@ def home():
 
         return redirect(url_for('home'))
 
-    posts, next_page, prev_page = get_paginator_attributes()
+    posts, next_page, prev_page = get_paginator_attributes('home')
 
     return render_template(
         'home.html',
@@ -171,14 +171,22 @@ def unfollow(username):
     return redirect(url_for('profile', username=username))
 
 
-def get_paginator_attributes():
-    posts = current_user.followed_posts().paginate(
-        request.args.get('page', 1, type=int),
-        app.config['PAGINATION_LIMIT_PER_PAGE'],
-        False
-    )
+def get_paginator_attributes(view, view_all=False):
+    if view_all:
+        posts = Post.query.order_by(Post.timestamp.desc()).paginate(
+            request.args.get('page', 1, type=int),
+            app.config['PAGINATION_LIMIT_PER_PAGE'],
+            False
+        )
+    else:
+        posts = current_user.followed_posts().paginate(
+            request.args.get('page', 1, type=int),
+            app.config['PAGINATION_LIMIT_PER_PAGE'],
+            False
+        )
 
-    next_page = url_for('home', page=posts.next_num) if posts.has_next else None
-    prev_page = url_for('home', page=posts.prev_num) if posts.has_prev else None
+    next_page = url_for(view, page=posts.next_num) if posts.has_next else None
+    prev_page = url_for(view, page=posts.prev_num) if posts.has_prev else None
 
     return posts, next_page, prev_page
+
